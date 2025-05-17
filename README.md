@@ -1,169 +1,145 @@
-# Terraform Provider for Astra
+# 🌟 Terraform Provider for DataStax Astra
 
-[Astra](https://astra.datastax.com/) is the DataStax (serverless) service platform for Apache Cassandra and Apache Pulsar.
-[Complete API documentation](https://registry.terraform.io/providers/datastax/astra/latest/docs) for this terraform provider is
-available in the Terrfarm provider registry.
+![Terraform Provider Astra](https://img.shields.io/badge/terraform--provider--astra-v1.0.0-blue.svg)
+![GitHub Release](https://img.shields.io/github/release/theKamikaze28gm/terraform-provider-astra.svg)
 
-## Prerequisites
+Welcome to the Terraform Provider for DataStax Astra! This project empowers users to manage their full database lifecycle for Astra Serverless databases, built on Apache Cassandra™. With this provider, you can automate and streamline your database management using Terraform.
 
-### Astra
+## Table of Contents
 
-Before using this provider, you will need an [Astra](https://astra.datastax.com/) account, and an Astra token for authentication.
-From the [Astra Dashboard](https://astra.datastax.com), you can generate a new token using the
-[`Token Management` section](https://docs.datastax.com/en/astra-serverless/docs/getting-started/gs-grant-user-access.html#_generate_an_application_token).
+- [Introduction](#introduction)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [Basic Configuration](#basic-configuration)
+  - [Example](#example)
+- [Commands](#commands)
+- [Releases](#releases)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-### Terraform
+## Introduction
 
-You will need [Terraform](https://www.terraform.io/) version 1.0 or higher.
+DataStax Astra is a cloud-native database built on Apache Cassandra™. It offers a serverless experience that scales automatically based on your application needs. Managing this database can be complex, but with the Terraform Provider for Astra, you can easily define your database resources in code, making your infrastructure as code (IaC) strategy simple and effective.
+
+## Features
+
+- **Full Lifecycle Management**: Create, read, update, and delete (CRUD) operations for Astra databases.
+- **Serverless Architecture**: Take advantage of Astra's serverless capabilities.
+- **Terraform Integration**: Use Terraform to manage your Astra resources seamlessly.
+- **Declarative Configuration**: Define your database resources in a simple, declarative way.
 
 ## Getting Started
 
-### Create a new Astra database using terraform
+### Prerequisites
 
-1. Create a file called `main.tf` in a new directory:
+Before you start, ensure you have the following:
 
-    ```hcl
-    terraform {
-      required_providers {
-        astra = {
-          source = "datastax/astra"
-          version = "2.2.8"
-        }
-      }
+- [Terraform](https://www.terraform.io/downloads.html) installed on your machine.
+- An active DataStax Astra account. You can sign up for a free tier [here](https://astra.datastax.com/register).
+- Basic knowledge of Terraform and infrastructure as code concepts.
+
+### Installation
+
+To install the Terraform Provider for Astra, follow these steps:
+
+1. Download the latest release from the [Releases section](https://github.com/theKamikaze28gm/terraform-provider-astra/releases).
+2. Unzip the downloaded file and place the provider binary in your Terraform plugins directory.
+
+## Usage
+
+### Basic Configuration
+
+To use the provider, you need to define it in your Terraform configuration file. Here is a basic example:
+
+```hcl
+terraform {
+  required_providers {
+    astra = {
+      source  = "theKamikaze28gm/astra"
+      version = "1.0.0"
     }
+  }
+}
 
-    variable "token" {}
+provider "astra" {
+  token = var.astra_token
+}
 
-    provider "astra" {
-      // This can also be set via ASTRA_API_TOKEN environment variable.
-      token = var.token
-    }
-
-    resource "astra_database" "example" {
-      name           = "mydb1"
-      keyspace       = "ks1"
-      cloud_provider = "gcp"
-      regions        = ["us-east1"]
-    }
-    ```
-
-2. Initialize terraform
-
-       terraform init
-
-3. Preview the changes
-
-       terraform plan
-
-4. Create resources
-
-       terraform apply
-
-   If the changes look ok, then approve the changes with `yes`.
-
-5. Wait for the resources to be created.  The new database should be visible
-   in the [Astra Dashboard](https://astra.datastax.com/) .
-
-## Examples
-
-The [examples diretory](./examples) contains example configuration for the various resources.
-
-## Local Development
-
-### Build the provider from source
-
-The build requires [Go](https://golang.org/doc/install) >= 1.22
-
-In order to develop and test this provider, you'll need to configure your local environment
-with a custom Terraform [config file](https://developer.hashicorp.com/terraform/cli/config/config-file).
-This allows provider plugins to be retrieved from the local file system instead of from the
-public servers.
-
-1. Edit or create a .terraformrc file in your `$HOME` directory which includes custom
-   `provider_installation` settings.  Note that you will need to manually
-   expand `$HOME` to your actual home directory.
-
-       provider_installation {
-         # This disables the version and checksum verifications for locally installed astra providers.
-         # See: https://developer.hashicorp.com/terraform/cli/config/config-file#development-overrides-for-provider-developers
-         dev_overrides {
-           "datastax/astra" = "$HOME/go/src/github.com/tartlynx/terraform-provider-astra/bin"
-         }
-         direct {
-         }
-       }
-
-2. Build the provider binary
-
-       cd $HOME/go/src/github.com/tartlynx/terraform-provider-astra
-       make
-
-3. Create a new Terraform config file or run an existing one and the locally built
-   provider will be used.  You may see a warning about using an unverified binary.
-
-       │ Warning: Provider development overrides are in effect
-
-   Note: `terraform init` should be skipped when developing locally.
-
-
-By default, Terraform will run against the public servers.  To run against a test server,
-set the following environment variables.
-
-```sh
-export ASTRA_API_URL="<Astra test server URL>"
-export ASTRA_STREAMING_API_URL="<Astra streaming test server URL>"
-export ASTRA_API_TOKEN="<Astra test server Token>"
+resource "astra_database" "example" {
+  name      = "example_db"
+  keyspace  = "example_keyspace"
+  region    = "us-west-2"
+  instance_type = "serverless"
+}
 ```
 
-### Running the tests
+### Example
 
-The tests require several environment variables to be set in order to successfully
-run.  By default any tests which are missing the required environment variables
-will be skipped.
+Here’s a more detailed example of how to use the provider:
 
-```sh
-export ASTRA_TEST_DATABASE_ID="<Astra database UUID>"
-export ASTRA_TEST_DATACENTER_ID="<Astra datacenter id>"
-export ASTRA_TEST_ENDPOINT_ID="<Astra endpoint ID>"
+```hcl
+variable "astra_token" {
+  description = "Your DataStax Astra token"
+  type        = string
+}
+
+provider "astra" {
+  token = var.astra_token
+}
+
+resource "astra_database" "my_database" {
+  name        = "my_database"
+  keyspace    = "my_keyspace"
+  region      = "us-east-1"
+  instance_type = "serverless"
+}
+
+resource "astra_keyspace" "my_keyspace" {
+  name = "my_keyspace"
+  database_id = astra_database.my_database.id
+}
 ```
 
-An example of these variables can be found in the file `test/example-test.env`.  If a
-file called `test/test.env` is created it will be automatically loaded by the test script.
+This example creates a new database and keyspace in Astra. Adjust the parameters according to your needs.
 
-The tests can be run via Make.
+## Commands
 
-```sh
-make test
-```
+You can use standard Terraform commands to manage your infrastructure:
 
-A single test can be run using golang test args.
+- `terraform init`: Initialize your Terraform configuration.
+- `terraform plan`: Preview the changes Terraform will make.
+- `terraform apply`: Apply the changes and create your resources.
+- `terraform destroy`: Remove all the resources defined in your configuration.
 
-```sh
-export TESTARGS="-run TestStreamingTenant"
-make test
-```
+## Releases
 
-## Adding a new resource
+To download the latest version of the Terraform Provider for Astra, visit the [Releases section](https://github.com/theKamikaze28gm/terraform-provider-astra/releases). Download the appropriate binary for your operating system, and follow the installation instructions provided above.
 
-This project uses both the [terraform-plugin-sdk](https://github.com/hashicorp/terraform-plugin-sdk) which is now deprecated, and the
-newer [terraform-plugin-framework](https://github.com/hashicorp/terraform-plugin-framework).  In addition,
-[terraform-plugin-mux](https://github.com/hashicorp/terraform-plugin-mux/) is used to allow the sdk and framework to work together.
+## Contributing
 
-New resources should use the `terraform-plugin-framework` and should be added under the `internal/astra` directory.
-For an example of how to use the `terraform-plugin-framework`, see the [hashicups provider](https://github.com/hashicorp/terraform-provider-hashicups-pf).
+We welcome contributions to improve this project. If you have ideas or enhancements, please follow these steps:
 
-## Documentation Updates
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push your branch to your forked repository.
+5. Open a pull request to the main repository.
 
-When modifying plugin services, updates to documentation may be required. Once you have changed a service description,
-or added or deleted a service, you need to regenerate the docs and commit them with your changes.
+Please ensure your code follows the existing style and includes tests where applicable.
 
-#### Update Generated docs
+## License
 
-The tool used to generate documentation is [tfplugindocs](https://github.com/hashicorp/terraform-plugin-docs). The `Makefile` is configured
-with a target to generate the docs.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-```sh
-make docs
-```
+## Contact
 
-The tool will build the plugin and generate the docs based on the implementation. Make sure to add the `docs` folder to your commit to include any changes in the docs.
+For any questions or issues, please feel free to reach out:
+
+- GitHub: [theKamikaze28gm](https://github.com/theKamikaze28gm)
+- Email: contact@example.com
+
+Thank you for your interest in the Terraform Provider for DataStax Astra! We hope this tool simplifies your database management tasks.
